@@ -32,33 +32,38 @@ class SalaryController extends Controller
         }])->get()->map(function ($employee) use ($dates, $setting) {
 
             $count = [
-                'hadir' => 0,
-                'sakit' => 0,
-                'tidak_hadir' => 0, // 'izin', 'cuti', 'terlambat' akan masuk sini
-                'kosong' => 0,
+                'hadir'       => 0,
+                'sakit'       => 0,
+                'cuti'        => 0,
+                'izin'        => 0,
+                'tidak_hadir' => 0, // <-- TAMBAHKAN INI
+                'kosong'      => 0, // <-- TAMBAHKAN INI
             ];
 
             foreach ($dates as $date) {
                 $att = $employee->attendances->firstWhere('tanggal', $date);
                 if ($att) {
-                    // [DIPERBAIKI] Logika disederhanakan
                     if ($att->status == 'hadir') {
                         $count['hadir']++;
                     } elseif ($att->status == 'sakit') {
                         $count['sakit']++;
-                    } else {
+                    } elseif ($att->status == 'izin') {
+                        $count['izin']++;
+                    } elseif ($att->status == 'cuti') {
+                        $count['cuti']++;
+                    } elseif ($att->status == 'tidak_hadir') {
                         $count['tidak_hadir']++;
-                    }
+                    } // <-- Tambah
                 } else {
                     $count['kosong']++;
                 }
             }
 
-            // [DIPERBAIKI] Perhitungan gaji disesuaikan
+            // Gabungkan semua yang non-hadir
+            $nonHadir = $count['izin'] + $count['cuti'] + $count['tidak_hadir'];
             $totalSalary = ($count['hadir'] * $setting->present_rate) +
                 ($count['sakit'] * $setting->sick_rate) +
-                ($count['tidak_hadir'] * $setting->absent_rate);
-            // kosong tidak dihitung
+                ($nonHadir * $setting->absent_rate); // <-- Gunakan $nonHadir
 
             return [
                 'employee' => $employee,
@@ -116,12 +121,12 @@ class SalaryController extends Controller
         }])->findOrFail($id);
 
         $count = [
-            'hadir' => 0,
-            'sakit' => 0,
-            'cuti' => 0,
-            'izin' => 0,
-            'terlambat' => 0, // Ditambahkan untuk penampung
-            'tidak_hadir' => 0,
+            'hadir'       => 0,
+            'sakit'       => 0,
+            'cuti'        => 0,
+            'izin'        => 0,
+            'tidak_hadir' => 0, // <-- Tambah
+            'kosong'      => 0, // <-- Tambah
         ];
 
         foreach ($dates as $date) {
@@ -133,8 +138,8 @@ class SalaryController extends Controller
         }
 
         // [DIPERBAIKI] Logika gaji disesuaikan
-        // 'izin', 'cuti', 'terlambat', 'tidak_hadir' digabung
-        $nonHadir = $count['izin'] + $count['cuti'] + $count['terlambat'] + $count['tidak_hadir'];
+        // 'izin', 'cuti', 'tidak_hadir' digabung
+        $nonHadir = $count['izin'] + $count['cuti'] + $count['tidak_hadir'];
 
         $totalSalary = ($count['hadir'] * $setting->present_rate) +
             ($count['sakit'] * $setting->sick_rate) +
@@ -161,22 +166,34 @@ class SalaryController extends Controller
         }])->findOrFail($id);
 
         $count = [
-            'hadir' => 0,
-            'sakit' => 0,
-            'cuti' => 0,
-            'izin' => 0,
-            'terlambat' => 0,
+            'hadir'       => 0,
+            'sakit'       => 0,
+            'cuti'        => 0,
+            'izin'        => 0,
             'tidak_hadir' => 0,
+            'kosong'      => 0, // <-- TAMBAHKAN INI
         ];
 
         foreach ($dates as $date) {
             $att = $employee->attendances->firstWhere('tanggal', $date);
-            if ($att && isset($count[$att->status])) {
-                $count[$att->status]++;
+            if ($att) {
+                if ($att->status == 'hadir') {
+                    $count['hadir']++;
+                } elseif ($att->status == 'sakit') {
+                    $count['sakit']++;
+                } elseif ($att->status == 'izin') {
+                    $count['izin']++;
+                } elseif ($att->status == 'cuti') {
+                    $count['cuti']++;
+                } elseif ($att->status == 'tidak_hadir') {
+                    $count['tidak_hadir']++;
+                }
+            } else {
+                $count['kosong']++; // <-- TAMBAHKAN BLOK ELSE
             }
         }
 
-        $nonHadir = $count['izin'] + $count['cuti'] + $count['terlambat'] + $count['tidak_hadir'];
+        $nonHadir = $count['izin'] + $count['cuti'] + $count['tidak_hadir'];
         $totalSalary = ($count['hadir'] * $setting->present_rate) +
             ($count['sakit'] * $setting->sick_rate) +
             ($nonHadir * $setting->absent_rate);

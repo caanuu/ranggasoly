@@ -100,22 +100,27 @@ class ReportController extends Controller
         $reportData = $employees->map(function ($employee) use ($dates, $setting) {
             $count = [
                 'hadir'        => 0,
-                'terlambat'    => 0,
                 'izin'         => 0,
                 'sakit'        => 0,
                 'cuti'         => 0,
-                'tidak_hadir'  => 0,
+                'tidak_hadir'  => 0, // <-- Tambah
                 'kosong'       => 0,
             ];
 
             foreach ($dates as $date) {
                 $att = $employee->attendances->firstWhere('tanggal', $date);
                 if ($att) {
-                    if (isset($count[$att->status])) {
-                        $count[$att->status]++;
-                    } else {
-                        $count['tidak_hadir']++; // Status lain yg tidak terdefinisi
-                    }
+                    if ($att->status == 'hadir') {
+                        $count['hadir']++;
+                    } elseif ($att->status == 'sakit') {
+                        $count['sakit']++;
+                    } elseif ($att->status == 'izin') {
+                        $count['izin']++;
+                    } elseif ($att->status == 'cuti') {
+                        $count['cuti']++;
+                    } elseif ($att->status == 'tidak_hadir') {
+                        $count['tidak_hadir']++;
+                    } // <-- Tambah
                 } else {
                     $count['kosong']++;
                 }
@@ -123,7 +128,7 @@ class ReportController extends Controller
 
             // [DIPERBAIKI] Logika gaji disesuaikan dengan database
             // 'terlambat', 'izin', 'cuti', 'tidak_hadir' digabung dan dikali absent_rate
-            $nonHadir = $count['terlambat'] + $count['izin'] + $count['cuti'] + $count['tidak_hadir'];
+            $nonHadir = $count['izin'] + $count['cuti'] + $count['tidak_hadir']; // <-- Tambah
 
             $totalSalary = ($count['hadir'] * $setting->present_rate) +
                 ($count['sakit'] * $setting->sick_rate) +

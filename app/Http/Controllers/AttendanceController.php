@@ -128,25 +128,38 @@ class AttendanceController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'tanggal'     => 'required|date',
             'foto_bukti'  => 'nullable|image|max:2048',
-            'status'      => 'required|in:hadir,izin,sakit,cuti',
+            'status'      => 'required|in:hadir,izin,sakit,cuti,tidak_hadir',
         ]);
 
-        $attendanceData = [
+        // Kunci unik untuk mencari data
+        $findData = [
             'employee_id' => $validated['employee_id'],
             'tanggal'     => $validated['tanggal'],
-            'status'      => $validated['status'],
+        ];
+
+        // Data yang akan di-update atau di-create
+        $updateData = [
+            'status' => $validated['status'],
         ];
 
         if ($request->hasFile('foto_bukti')) {
-            $attendanceData['foto_bukti'] = $request->file('foto_bukti')->store('bukti_kehadiran', 'public');
+            // Cek apakah ada foto lama dan hapus
+            $existing = Attendance::where($findData)->first();
+            if ($existing && $existing->foto_bukti && Storage::disk('public')->exists($existing->foto_bukti)) {
+                Storage::disk('public')->delete($existing->foto_bukti);
+            }
+
+            // Simpan foto baru
+            $updateData['foto_bukti'] = $request->file('foto_bukti')->store('bukti_kehadiran', 'public');
         }
 
-        $attendance = Attendance::create($attendanceData);
+        // Gunakan updateOrCreate untuk mencegah duplikasi
+        $attendance = Attendance::updateOrCreate($findData, $updateData);
 
         $employee = $attendance->employee;
         $tanggal = Carbon::parse($attendance->tanggal)->translatedFormat('l, d F Y');
 
-        $activityText = "{$employee->nama} {$attendance->status} pada hari {$tanggal}";
+        $activityText = "{$employee->name} {$attendance->status} pada hari {$tanggal}";
 
         ActivityLog::create([
             'employee_id' => $employee->id,

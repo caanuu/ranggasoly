@@ -283,7 +283,7 @@
                     </tr>
 
                     @php
-                        $nonHadirCount = $count['tidak_hadir'] + $count['cuti'] + $count['izin'] + $count['terlambat'];
+                        $nonHadirCount = $count['tidak_hadir'] + $count['cuti'] + $count['izin'];
                     @endphp
                     <tr>
                         <td>Tidak Hadir (Cuti/Izin/Lainnya)</td>

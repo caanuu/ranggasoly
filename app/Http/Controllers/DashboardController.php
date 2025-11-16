@@ -26,7 +26,7 @@ class DashboardController extends Controller
 
         // Jumlah semua yang hadir (termasuk telat)
         $totalHadirHariIni = Attendance::whereDate('tanggal', $today)
-            ->whereIn('status', ['hadir', 'terlambat'])
+            ->whereIn('status', ['hadir'])
             ->count();
 
         // Persentase kehadiran tepat waktu
@@ -49,27 +49,29 @@ class DashboardController extends Controller
             $counts = [
                 'hadir' => 0,
                 'sakit' => 0,
-                'tidak_hadir' => 0 // Ini akan mencakup 'izin', 'cuti', 'terlambat', dll.
+                'izin' => 0,
+                'cuti' => 0,
+                'tidak_hadir' => 0 // <-- Tambah
             ];
 
             foreach ($employee->attendances as $att) {
-                // [DIPERBAIKI] Logika disederhanakan agar sesuai dengan database
                 if ($att->status == 'hadir') {
                     $counts['hadir']++;
                 } elseif ($att->status == 'sakit') {
                     $counts['sakit']++;
-                } else {
-                    // Semua status lain (izin, cuti, terlambat, tidak_hadir)
-                    // dianggap sebagai 'tidak_hadir' untuk perhitungan gaji
+                } elseif ($att->status == 'izin') {
+                    $counts['izin']++;
+                } elseif ($att->status == 'cuti') {
+                    $counts['cuti']++;
+                } elseif ($att->status == 'tidak_hadir') {
                     $counts['tidak_hadir']++;
-                }
+                } // <-- Tambah
             }
 
-            // [DIPERBAIKI] Perhitungan gaji disesuaikan dengan kolom yang ada
-            // (present_rate, sick_rate, absent_rate)
+            $nonHadirCount = $counts['izin'] + $counts['cuti'] + $counts['tidak_hadir']; // <-- Tambah
             $totalSalary += ($counts['hadir'] * $setting->present_rate) +
                 ($counts['sakit'] * $setting->sick_rate) +
-                ($counts['tidak_hadir'] * $setting->absent_rate);
+                ($nonHadirCount * $setting->absent_rate);
         }
 
         // Cuti pending (misalnya status cuti = "pending")

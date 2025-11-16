@@ -102,11 +102,10 @@
                         <tr>
                             <th class="ps-4">Nama</th>
                             <th class="text-center">Hadir</th>
-                            <th class="text-center">Telat</th>
                             <th class="text-center">Izin</th>
                             <th class="text-center">Sakit</th>
                             <th class="text-center">Cuti</th>
-                            <th class="text-center">Tdk Hadir</th>
+                            <th class="text-center">Tidak Hadir</th>
                             <th class="text-end pe-4">Total Gaji</th>
                         </tr>
                     </thead>
@@ -121,7 +120,6 @@
                                     </div>
                                 </td>
                                 <td class="text-center">{{ $data['hadir'] }}</td>
-                                <td class="text-center">{{ $data['terlambat'] }}</td>
                                 <td class="text-center">{{ $data['izin'] }}</td>
                                 <td class="text-center">{{ $data['sakit'] }}</td>
                                 <td class="text-center">{{ $data['cuti'] }}</td>

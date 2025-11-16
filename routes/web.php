@@ -36,7 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/karyawan/kehadiran/tambah', [AttendanceController::class, 'create'])->name('attendances.create');
     Route::get('/kehadiran', [AttendanceController::class, 'index'])->name('attendances.index');
     Route::get('/api/employees/search', [AttendanceController::class, 'searchEmployee']);
-    Route::post('/karyawan/{employee}/kehadiran', [AttendanceController::class, 'store'])->name('attendances.store');
+    Route::post('/kehadiran', [AttendanceController::class, 'store'])->name('attendances.store');
 
     // Leave (Cuti)
     Route::get('/cuti', [LeaveController::class, 'index'])->name('leaves.index');

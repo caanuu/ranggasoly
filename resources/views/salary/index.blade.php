@@ -89,11 +89,11 @@
                         @endforelse
                     </tbody>
                     <tfoot class="table-light fw-bold">
-                        <tr>
+                        {{-- <tr>
                             <td colspan="5" class="text-center">Total Penggajian Bulan Ini</td>
                             <td class="text-center">Rp {{ number_format($salarycost, 0, ',', '.') }}</td>
                             <td></td>
-                        </tr>
+                        </tr> --}}
                     </tfoot>
                 </table>
             </div>

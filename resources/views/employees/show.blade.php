@@ -72,7 +72,6 @@
                     <h5 class="fw-bold mb-3">Rekap Absensi (Semua)</h5>
                     <div class="d-flex flex-wrap gap-2">
                         <span class="badge bg-success rekap-badge">Hadir: {{ $rekap['hadir'] }}</span>
-                        <span class="badge bg-warning text-dark rekap-badge">Terlambat: {{ $rekap['terlambat'] }}</span>
                         <span class="badge bg-danger rekap-badge">Sakit: {{ $rekap['sakit'] }}</span>
                         <span class="badge bg-primary rekap-badge">Cuti: {{ $rekap['cuti'] }}</span>
                         <span class="badge bg-info text-dark rekap-badge">Izin: {{ $rekap['izin'] }}</span>
