@@ -56,7 +56,6 @@ class AttendanceController extends Controller
                 $dates = array_merge($dates, $w['dates']);
             }
             $dates = array_unique($dates);
-
         } elseif ($filter == 'year') {
             $year = $request->get('year', now()->year);
             $start = Carbon::create($year, 1, 1);
@@ -81,7 +80,6 @@ class AttendanceController extends Controller
                 $dates = array_merge($dates, $monthDates);
             }
             $dates = array_unique($dates);
-
         } else { // week
             $start = Carbon::now()->startOfWeek(); // Senin
             $end = $start->copy()->addDays(5); // Sabtu
@@ -108,7 +106,7 @@ class AttendanceController extends Controller
         }
 
         // Eager load attendances hanya pada tanggal yang diperlukan
-        $employees = Employee::with(['attendances' => function($q) use ($dates) {
+        $employees = Employee::with(['attendances' => function ($q) use ($dates) {
             $q->whereIn('tanggal', $dates);
         }])->get();
 
@@ -121,7 +119,7 @@ class AttendanceController extends Controller
         return Employee::where('name', 'like', "%$q%")
             ->orWhere('nomor_pegawai', 'like', "%$q%")
             ->limit(10)
-            ->get(['id','name','nomor_pegawai']);
+            ->get(['id', 'name', 'nomor_pegawai']);
     }
 
     public function store(Request $request)
@@ -130,7 +128,7 @@ class AttendanceController extends Controller
             'employee_id' => 'required|exists:employees,id',
             'tanggal'     => 'required|date',
             'foto_bukti'  => 'nullable|image|max:2048',
-            'status'      => 'required|in:hadir,terlambat,izin,sakit,cuti',
+            'status'      => 'required|in:hadir,izin,sakit,cuti',
         ]);
 
         $attendanceData = [
@@ -147,7 +145,7 @@ class AttendanceController extends Controller
 
         $employee = $attendance->employee;
         $tanggal = Carbon::parse($attendance->tanggal)->translatedFormat('l, d F Y');
-        
+
         $activityText = "{$employee->nama} {$attendance->status} pada hari {$tanggal}";
 
         ActivityLog::create([

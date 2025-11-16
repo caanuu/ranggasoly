@@ -133,7 +133,6 @@
                                     <tr>
                                         <th class="ps-4">Nama Pegawai</th>
                                         <th class="text-center">Hadir</th>
-                                        <th class="text-center">Terlambat</th>
                                         <th class="text-center">Izin</th>
                                         <th class="text-center">Sakit</th>
                                         <th class="text-center">Cuti</th>
@@ -162,7 +161,6 @@
                                                 </div>
                                             </td>
                                             <td class="text-center">{{ $count['hadir'] }}</td>
-                                            <td class="text-center">{{ $count['terlambat'] }}</td>
                                             <td class="text-center">{{ $count['izin'] }}</td>
                                             <td class="text-center">{{ $count['sakit'] }}</td>
                                             <td class="text-center">{{ $count['cuti'] }}</td>
