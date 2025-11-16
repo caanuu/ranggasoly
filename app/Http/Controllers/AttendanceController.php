@@ -81,23 +81,14 @@ class AttendanceController extends Controller
             }
             $dates = array_unique($dates);
         } else { // week
-            $start = Carbon::now()->startOfWeek(); // Senin
-            $end = $start->copy()->addDays(5); // Sabtu
-            $label = 'Minggu Ini';
-
-            $period = CarbonPeriod::create($start, $end);
-            $dates = [];
-            foreach ($period as $date) {
-                $dates[] = $date->toDateString();
-            }
-        }
-
-        if ($filter == 'week') {
             $start = $request->get('start')
                 ? Carbon::parse($request->get('start'))
                 : Carbon::now()->startOfWeek();
             $end = $start->copy()->addDays(5); // Senin-Sabtu
-            $label = 'Minggu Ini';
+
+            // Perbarui label berdasarkan rentang tanggal
+            $label = $start->format('d M') . ' - ' . $end->format('d M Y');
+
             $period = CarbonPeriod::create($start, $end);
             $dates = [];
             foreach ($period as $date) {
@@ -110,7 +101,24 @@ class AttendanceController extends Controller
             $q->whereIn('tanggal', $dates);
         }])->get();
 
-        return view('attendances.index', compact('employees', 'dates', 'label', 'weeks', 'months'));
+        // --- [BLOK PERUBAHAN UTAMA] ---
+
+        // Kumpulkan semua data yang diperlukan oleh view
+        $data = compact('employees', 'dates', 'label', 'weeks', 'months');
+
+        // Cek apakah ini permintaan AJAX
+        if ($request->ajax() || $request->wantsJson()) {
+            // Jika ya, kirim respon JSON
+            return response()->json([
+                // Render HANYA partial view dan kirim sebagai string HTML
+                'html' => view('attendances._data', $data)->render(),
+                // Kirim juga label baru untuk header
+                'label' => $label ? "({$label})" : ''
+            ]);
+        }
+
+        // Jika tidak, kembalikan tampilan halaman penuh (seperti biasa)
+        return view('attendances.index', $data);
     }
 
     public function searchEmployee(Request $request)
