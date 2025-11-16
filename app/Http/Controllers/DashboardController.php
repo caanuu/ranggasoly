@@ -68,10 +68,13 @@ class DashboardController extends Controller
                 } // <-- Tambah
             }
 
-            $nonHadirCount = $counts['izin'] + $counts['cuti'] + $counts['tidak_hadir']; // <-- Tambah
-            $totalSalary += ($counts['hadir'] * $setting->present_rate) +
-                ($counts['sakit'] * $setting->sick_rate) +
-                ($nonHadirCount * $setting->absent_rate);
+            // [DIPERBAIKI] Hanya tambahkan ke total jika karyawan pernah 'hadir'
+            if ($counts['hadir'] > 0) {
+                $nonHadirCount = $counts['izin'] + $counts['cuti'] + $counts['tidak_hadir'];
+                $totalSalary += ($counts['hadir'] * $setting->present_rate) +
+                    ($counts['sakit'] * $setting->sick_rate) +
+                    ($nonHadirCount * $setting->absent_rate);
+            }
         }
 
         // Cuti pending (misalnya status cuti = "pending")

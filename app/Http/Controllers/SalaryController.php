@@ -72,7 +72,10 @@ class SalaryController extends Controller
             ];
         });
 
-        $salarycost = $employees->sum('totalSalary');
+        // [DIPERBAIKI] Hanya hitung total gaji dari karyawan yang pernah 'hadir'
+        $salarycost = $employees->filter(function ($data) {
+            return $data['hadir'] > 0;
+        })->sum('totalSalary');
 
         return view('salary.index', compact('employees', 'month', 'year', 'salarycost'));
     }

@@ -143,7 +143,10 @@ class ReportController extends Controller
         });
 
         // --- Statistik agregat ---
-        $salarycost = $reportData->sum('totalSalary');
+        // [DIPERBAIKI] Hanya hitung total gaji dari karyawan yang pernah 'hadir'
+        $salarycost = $reportData->filter(function ($data) {
+            return $data['hadir'] > 0;
+        })->sum('totalSalary');
         $totalCutiPegawai = Attendance::where('status', 'cuti')
             ->whereIn('tanggal', $dates)
             ->distinct('employee_id')

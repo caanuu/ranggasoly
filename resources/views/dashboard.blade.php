@@ -5,10 +5,10 @@
 @push('styles')
     <style>
         /*
-              =================================
-              STYLE KHUSUS DASHBOARD
-              =================================
-            */
+                  =================================
+                  STYLE KHUSUS DASHBOARD
+                  =================================
+                */
 
         /* Kartu Selamat Datang (BARU) */
         .welcome-card {
@@ -168,7 +168,7 @@
                             <tbody>
                                 @forelse($logs as $log)
                                     <tr>
-                                        <td class="px-3">{{ $log->employee->name }}</td>
+                                        <td class="px-3">{{ $log->employee->name ?? 'Karyawan Dihapus' }}</td>
                                         <td class="px-3">{{ $log->activity }}</td>
                                         <td class="px-3 text-muted small">{{ $log->created_at->format('d M, H:i') }}</td>
                                     </tr>
